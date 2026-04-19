@@ -1,0 +1,26 @@
+services:
+  # Backend Web Service (Docker)
+  - type: web
+    name: factory-ai-backend
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false # Prompt user for MongoDB Atlas URI in Render dashboard
+
+  # Frontend Static Site (Optimized for Vite)
+  - type: static
+    name: factory-ai-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: factory-ai-backend
+          type: web
+          property: url

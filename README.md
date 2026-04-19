@@ -17,17 +17,33 @@ Prerequisites: Docker and Docker Compose installed.
 3. Navigate to `http://localhost:8080` to see the dashboard.
 4. Click **"Refresh Mock Data"** to automatically insert mock workers, workstations, and a simulated set of events for testing.
 
-## Deployment to Render
-This application is fully compatible with **Render**.
-1. Create a **MongoDB** instance (e.g., MongoDB Atlas).
-2. Create a **Web Service** on Render pointing to the `/backend` directory. Set Environment Variables:
-   - `MONGODB_URI`: Your MongoDB connection string.
-   - Install Command: `npm install`
-   - Build Command: `npm start` (or `node index.js`)
-3. Create a **Static Site** on Render pointing to the `/frontend` directory.
-   - Build Command: `npm install && npm run build`
-   - Publish Directory: `dist`
-   - Environment Variable: `VITE_API_URL` pointing to your Backend URL.
+## Deployment to Render (Blueprint)
+
+This project is configured for one-click deployment using **Render Blueprints**.
+
+### 1. Database Setup (MongoDB Atlas)
+Since Render does not provide a built-in MongoDB service, you must use an external provider like MongoDB Atlas:
+1.  Sign up at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2.  Create a new **Free Shared Cluster**.
+3.  In **Network Access**, allow access from `0.0.0.0/0` (or Render's IP range if preferred).
+4.  In **Database Access**, create a user with a password.
+5.  Click **Connect** -> **Drivers** -> Copy the **Connection String** (it looks like `mongodb+srv://...`).
+
+### 2. Connect to Render
+1.  Push your code to a GitHub repository.
+2.  Go to the [Render Dashboard](https://dashboard.render.com/).
+3.  Click **New +** -> **Blueprint**.
+4.  Connect your GitHub repository.
+5.  Render will detect the `render.yaml` file.
+6.  Enter the `MONGODB_URI` (your MongoDB Atlas connection string) when prompted.
+7.  Click **Apply**.
+
+Render will automatically provision:
+-   **factory-ai-backend**: A Docker-based Web Service.
+-   **factory-ai-frontend**: A Static Site (optimized for Vite).
+
+The frontend is automatically networked to communicate with the backend via the `VITE_API_URL` environment variable defined in the blueprint.
+
 
 ## Database Schema (MongoDB)
 - **Worker**: `{ worker_id: String (Unique), name: String }`
